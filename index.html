@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clippings</title>
+<style>
+  :root { --bg: #fff; --fg: #1a1a1a; --muted: #6b6b6b; --line: #e5e5e5; --link: #1f5fbf; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #161616; --fg: #e8e8e8; --muted: #9a9a9a; --line: #2c2c2c; --link: #8ab4f8; }
+  }
+  body { margin: 0; background: var(--bg); color: var(--fg);
+         font: 15px/1.6 -apple-system, BlinkMacSystemFont, "Hiragino Sans", sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 32px 16px; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  #count { color: var(--muted); font-size: 13px; margin: 0 0 16px; }
+  input { width: 100%; box-sizing: border-box; padding: 8px 10px; font-size: 15px;
+          border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--fg); }
+  ul { list-style: none; padding: 0; margin: 16px 0 0; }
+  li { padding: 10px 0; border-bottom: 1px solid var(--line); }
+  a { color: var(--link); text-decoration: none; word-break: break-word; }
+  a:hover { text-decoration: underline; }
+  .meta { color: var(--muted); font-size: 12px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Clippings</h1>
+  <p id="count"></p>
+  <input id="q" type="search" placeholder="タイトルで絞り込む">
+  <ul id="list"></ul>
+</main>
+<script>
+  const list = document.getElementById("list");
+  const count = document.getElementById("count");
+  let items = [];
+
+  function render(q) {
+    const shown = items.filter(e => e.title.toLowerCase().includes(q.toLowerCase()));
+    count.textContent = `${shown.length} / ${items.length} 件`;
+    list.replaceChildren(...shown.map(e => {
+      const li = document.createElement("li");
+      const a = document.createElement("a");
+      a.href = e.url;
+      a.textContent = e.title;
+      a.rel = "noopener";
+      a.target = "_blank";
+      const meta = document.createElement("div");
+      meta.className = "meta";
+      meta.textContent = [e.published, new URL(e.url).hostname].filter(Boolean).join(" · ");
+      li.append(a, meta);
+      return li;
+    }));
+  }
+
+  fetch("links.json")
+    .then(r => r.json())
+    .then(d => { items = d; render(""); });
+  document.getElementById("q").addEventListener("input", e => render(e.target.value));
+</script>
+</body>
+</html>
