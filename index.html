@@ -47,7 +47,7 @@
       a.target = "_blank";
       const meta = document.createElement("div");
       meta.className = "meta";
-      meta.textContent = [e.published, new URL(e.url).hostname].filter(Boolean).join(" · ");
+      meta.textContent = [e.created, new URL(e.url).hostname].filter(Boolean).join(" · ");
       li.append(a, meta);
       return li;
     }));
